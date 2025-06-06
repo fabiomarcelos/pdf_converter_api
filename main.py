@@ -1,9 +1,11 @@
 from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware  # ← ADICIONE ESTA LINHA
 from fastapi.responses import StreamingResponse, JSONResponse
 from converter import convert_pdf_to_zip
 import tempfile
 import os
 import logging
+import io  # ← ADICIONE ESTA LINHA
 
 app = FastAPI()
 
@@ -16,11 +18,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Adicione um endpoint para teste de conectividade
+@app.get("/")
+async def root():
+    return {"message": "Servidor funcionando", "status": "ok"}
+
 logging.basicConfig(level=logging.INFO)
 
 @app.post("/convert/upload")
 async def convert_uploaded_file(file: UploadFile = File(...)):
     try:
+        logging.info(f"Recebendo arquivo: {file.filename}, tamanho: {file.size}")
         suffix = ".pdf"
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
             contents = await file.read()
@@ -41,6 +49,7 @@ async def convert_uploaded_file(file: UploadFile = File(...)):
 @app.post("/convert/url")
 async def convert_from_url(url: str = Form(...)):
     try:
+        logging.info(f"Convertendo da URL: {url}")
         zip_data = convert_pdf_to_zip(url, is_url=True)
 
         filename = url.split("/")[-1].replace('.pdf', '')
