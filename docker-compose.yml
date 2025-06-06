@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  pdf-api:
+    build: .
+    ports:
+      - "8000:8000"
+    container_name: pdf_converter_api
+    restart: always
