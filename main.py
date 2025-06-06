@@ -6,6 +6,16 @@ import os
 import logging
 
 app = FastAPI()
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Em produção, especifique os domínios permitidos
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
 logging.basicConfig(level=logging.INFO)
 
 @app.post("/convert/upload")
